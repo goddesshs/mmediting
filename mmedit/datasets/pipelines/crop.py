@@ -343,8 +343,9 @@ class PairedRandomCrop:
         gt_patch_size (int): cropped gt patch size.
     """
 
-    def __init__(self, gt_patch_size):
+    def __init__(self, gt_patch_size, scale):
         self.gt_patch_size = gt_patch_size
+        self.scale = scale
 
     def __call__(self, results):
         """Call function.
@@ -356,7 +357,8 @@ class PairedRandomCrop:
         Returns:
             dict: A dict containing the processed data and information.
         """
-        scale = results['scale']
+        # scale = results['scale']
+        scale = self.scale
         lq_patch_size = self.gt_patch_size // scale
 
         lq_is_list = isinstance(results['lq'], list)

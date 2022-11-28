@@ -1,8 +1,9 @@
+nohup: ignoring input
 /home3/huangshan/open-mmlab/mmediting/mmedit/utils/setup_env.py:33: UserWarning: Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed.
   f'Setting OMP_NUM_THREADS environment variable for each process '
 /home3/huangshan/open-mmlab/mmediting/mmedit/utils/setup_env.py:43: UserWarning: Setting MKL_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed.
   f'Setting MKL_NUM_THREADS environment variable for each process '
-2022-11-28 11:11:30,103 - mmedit - INFO - Environment info:
+2022-11-28 21:19:48,035 - mmedit - INFO - Environment info:
 ------------------------------------------------------------
 sys.platform: linux
 Python: 3.7.13 (default, Oct 18 2022, 18:57:03) [GCC 11.2.0]
@@ -35,23 +36,26 @@ MMCV CUDA Compiler: 10.2
 MMEditing: 0.16.0+556a1e0
 ------------------------------------------------------------
 
-2022-11-28 11:11:30,104 - mmedit - INFO - Distributed training: False
-2022-11-28 11:11:30,104 - mmedit - INFO - mmedit Version: 0.16.0
-2022-11-28 11:11:30,104 - mmedit - INFO - Config:
-/home3/huangshan/open-mmlab/mmediting/configs/restorers/rdn/rdn_x4c64b16_g1_brain256.py
-exp_name = 'rdn_x4c64b16_g1_100k_div2k'
+2022-11-28 21:19:48,036 - mmedit - INFO - Distributed training: False
+2022-11-28 21:19:48,037 - mmedit - INFO - mmedit Version: 0.16.0
+2022-11-28 21:19:48,037 - mmedit - INFO - Config:
+/home3/huangshan/open-mmlab/mmediting/configs/restorers/edsr/edsr_brainhualiao_1000k.py
+exp_name = 'edsr_brainhualiao_1000k.py'
 
 scale = 1
 # model settings
 model = dict(
     type='BasicRestorer',
     generator=dict(
-        type='RDN',
+        type='EDSR',
         in_channels=3,
         out_channels=3,
         mid_channels=64,
         num_blocks=16,
-        upscale_factor=scale),
+        upscale_factor=scale,
+        res_scale=1,
+        rgb_mean=[0.4488, 0.4371, 0.4040],
+        rgb_std=[1.0, 1.0, 1.0]),
     pixel_loss=dict(type='L1Loss', loss_weight=1.0, reduction='mean'))
 # model training and testing settings
 train_cfg = None
@@ -75,7 +79,7 @@ train_pipeline = [
         channel_order='rgb'),
     
     dict(type='RescaleToZeroOne', keys=['lq', 'gt']),
-    dict(type='PairedRandomCrop', gt_patch_size=32),
+    dict(type='PairedRandomCrop', gt_patch_size=32, scale=1),
     dict(
         type='Flip', keys=['lq', 'gt'], flip_ratio=0.5,
         direction='horizontal'),
@@ -104,9 +108,9 @@ test_pipeline = [
 
 data = dict(
     workers_per_gpu=4,
-    train_dataloader=dict(samples_per_gpu=16, drop_last=True),
-    val_dataloader=dict(samples_per_gpu=16),
-    test_dataloader=dict(samples_per_gpu=16),
+    train_dataloader=dict(samples_per_gpu=8, drop_last=True),
+    val_dataloader=dict(samples_per_gpu=1),
+    test_dataloader=dict(samples_per_gpu=1),
     train=dict(
         type='RepeatDataset',
         times=1000,
@@ -116,21 +120,24 @@ data = dict(
             gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/train_hr3',
             # ann_file='data/DIV2K/meta_info_DIV2K800sub_GT.txt',
             pipeline=train_pipeline,
-            scale=scale)),
+            scale=scale,
+            ratio=0.3)),
     val=dict(
         type=val_dataset_type,
         lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_lr3',
         gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_hr3',
         pipeline=test_pipeline,
         scale=scale,
-        filename_tmpl='{}'),
+        filename_tmpl='{}',
+        ratio=0.3),
     test=dict(
         type=val_dataset_type,
         lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/test_lr3',
         gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/test_hr3',
         pipeline=test_pipeline,
         scale=scale,
-        filename_tmpl='{}'))
+        filename_tmpl='{}',
+        ratio=0.3))
 
 # optimizer
 optimizers = dict(generator=dict(type='Adam', lr=1e-4, betas=(0.9, 0.999)))
@@ -157,4 +164,29 @@ load_from = None
 resume_from = None
 workflow = [('train', 1)]
 
-2022-11-28 11:11:30,105 - mmedit - INFO - Set random seed to 362831298, deterministic: False
+2022-11-28 21:19:48,037 - mmedit - INFO - Set random seed to 1694509451, deterministic: False
+Traceback (most recent call last):
+  File "/home/huangshan/anaconda3/envs/open-mmlab/lib/python3.7/site-packages/mmcv/utils/registry.py", line 69, in build_from_cfg
+    return obj_cls(**args)
+  File "/home3/huangshan/open-mmlab/mmediting/mmedit/datasets/sr_folder_dataset.py", line 64, in __init__
+    self.data_infos = self.load_annotations()
+  File "/home3/huangshan/open-mmlab/mmediting/mmedit/datasets/sr_folder_dataset.py", line 83, in load_annotations
+    for i in range(int(self.ratio * gt_path)):
+  File "/home/huangshan/anaconda3/envs/open-mmlab/lib/python3.7/site-packages/torch/utils/data/dataset.py", line 83, in __getattr__
+    raise AttributeError
+AttributeError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home3/huangshan/open-mmlab/mmediting/tools/train.py", line 170, in <module>
+    main()
+  File "/home3/huangshan/open-mmlab/mmediting/tools/train.py", line 136, in main
+    datasets = [build_dataset(cfg.data.train)]
+  File "/home3/huangshan/open-mmlab/mmediting/mmedit/datasets/builder.py", line 74, in build_dataset
+    build_dataset(cfg['dataset'], default_args), cfg['times'])
+  File "/home3/huangshan/open-mmlab/mmediting/mmedit/datasets/builder.py", line 78, in build_dataset
+    dataset = build_from_cfg(cfg, DATASETS, default_args)
+  File "/home/huangshan/anaconda3/envs/open-mmlab/lib/python3.7/site-packages/mmcv/utils/registry.py", line 72, in build_from_cfg
+    raise type(e)(f'{obj_cls.__name__}: {e}')
+AttributeError: SRFolderDataset: 

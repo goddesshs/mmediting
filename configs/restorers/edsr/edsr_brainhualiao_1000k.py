@@ -1,16 +1,19 @@
-exp_name = 'rdn_x4c64b16_g1_100k_div2k'
+exp_name = 'edsr_brainhualiao_1000k.py'
 
 scale = 1
 # model settings
 model = dict(
     type='BasicRestorer',
     generator=dict(
-        type='RDN',
+        type='EDSR',
         in_channels=3,
         out_channels=3,
         mid_channels=64,
         num_blocks=16,
-        upscale_factor=scale),
+        upscale_factor=scale,
+        res_scale=1,
+        rgb_mean=[0.4488, 0.4371, 0.4040],
+        rgb_std=[1.0, 1.0, 1.0]),
     pixel_loss=dict(type='L1Loss', loss_weight=1.0, reduction='mean'))
 # model training and testing settings
 train_cfg = None
@@ -34,7 +37,7 @@ train_pipeline = [
         channel_order='rgb'),
     
     dict(type='RescaleToZeroOne', keys=['lq', 'gt']),
-    dict(type='PairedRandomCrop', gt_patch_size=32),
+    dict(type='PairedRandomCrop', gt_patch_size=32, scale=1),
     dict(
         type='Flip', keys=['lq', 'gt'], flip_ratio=0.5,
         direction='horizontal'),
@@ -63,9 +66,9 @@ test_pipeline = [
 
 data = dict(
     workers_per_gpu=4,
-    train_dataloader=dict(samples_per_gpu=16, drop_last=True),
-    val_dataloader=dict(samples_per_gpu=16),
-    test_dataloader=dict(samples_per_gpu=16),
+    train_dataloader=dict(samples_per_gpu=8, drop_last=True),
+    val_dataloader=dict(samples_per_gpu=1),
+    test_dataloader=dict(samples_per_gpu=1),
     train=dict(
         type='RepeatDataset',
         times=1000,
@@ -75,21 +78,24 @@ data = dict(
             gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/train_hr3',
             # ann_file='data/DIV2K/meta_info_DIV2K800sub_GT.txt',
             pipeline=train_pipeline,
-            scale=scale)),
+            scale=scale,
+            ratio=0.3)),
     val=dict(
         type=val_dataset_type,
         lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_lr3',
         gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_hr3',
         pipeline=test_pipeline,
         scale=scale,
-        filename_tmpl='{}'),
+        filename_tmpl='{}',
+        ratio=0.3),
     test=dict(
         type=val_dataset_type,
         lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/test_lr3',
         gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/test_hr3',
         pipeline=test_pipeline,
         scale=scale,
-        filename_tmpl='{}'))
+        filename_tmpl='{}',
+        ratio=0.3))
 
 # optimizer
 optimizers = dict(generator=dict(type='Adam', lr=1e-4, betas=(0.9, 0.999)))
