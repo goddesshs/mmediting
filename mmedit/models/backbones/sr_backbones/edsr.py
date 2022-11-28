@@ -86,7 +86,7 @@ class EDSR(nn.Module):
             mid_channels=mid_channels,
             res_scale=res_scale)
         self.conv_after_body = nn.Conv2d(mid_channels, mid_channels, 3, 1, 1)
-        self.upsample = UpsampleModule(upscale_factor, mid_channels)
+        # self.upsample = UpsampleModule(upscale_factor, mid_channels)
         self.conv_last = nn.Conv2d(
             mid_channels, out_channels, 3, 1, 1, bias=True)
 
@@ -108,7 +108,8 @@ class EDSR(nn.Module):
         res = self.conv_after_body(self.body(x))
         res += x
 
-        x = self.conv_last(self.upsample(res))
+        # x = self.conv_last(self.upsample(res))
+        x = self.conv_last(res)
         x = x * self.std + self.mean
 
         return x

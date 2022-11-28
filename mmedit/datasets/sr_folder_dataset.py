@@ -55,11 +55,13 @@ class SRFolderDataset(BaseSRDataset):
                  pipeline,
                  scale,
                  test_mode=False,
-                 filename_tmpl='{}'):
+                 filename_tmpl='{}',
+                 ratio=1):
         super().__init__(pipeline, scale, test_mode)
         self.lq_folder = str(lq_folder)
         self.gt_folder = str(gt_folder)
         self.filename_tmpl = filename_tmpl
+        self.ratio = ratio
         self.data_infos = self.load_annotations()
 
     def load_annotations(self):
@@ -78,7 +80,8 @@ class SRFolderDataset(BaseSRDataset):
         assert len(lq_paths) == len(gt_paths), (
             f'gt and lq datasets have different number of images: '
             f'{len(lq_paths)}, {len(gt_paths)}.')
-        for i in range(1000):
+        length = int(self.ratio * len(gt_paths))
+        for i in range(length):
             gt_path = gt_paths[i]
         # for gt_path in gt_paths:
             basename, ext = osp.splitext(osp.basename(gt_path))

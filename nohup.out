@@ -1,0 +1,160 @@
+/home3/huangshan/open-mmlab/mmediting/mmedit/utils/setup_env.py:33: UserWarning: Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed.
+  f'Setting OMP_NUM_THREADS environment variable for each process '
+/home3/huangshan/open-mmlab/mmediting/mmedit/utils/setup_env.py:43: UserWarning: Setting MKL_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed.
+  f'Setting MKL_NUM_THREADS environment variable for each process '
+2022-11-28 11:11:30,103 - mmedit - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.7.13 (default, Oct 18 2022, 18:57:03) [GCC 11.2.0]
+CUDA available: True
+GPU 0: GeForce RTX 2080 Ti
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 11.2, V11.2.142
+GCC: gcc (GCC) 12.2.0
+PyTorch: 1.10.0+cu102
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) oneAPI Math Kernel Library Version 2021.4-Product Build 20210904 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.2.3 (Git Hash 7336ca9f055cf1bfa13efb658fe15dc9b41f0740)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 10.2
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70
+  - CuDNN 7.6.5
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=10.2, CUDNN_VERSION=7.6.5, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.10.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, 
+
+TorchVision: 0.11.0+cu102
+OpenCV: 4.6.0
+MMCV: 1.6.2
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 10.2
+MMEditing: 0.16.0+556a1e0
+------------------------------------------------------------
+
+2022-11-28 11:11:30,104 - mmedit - INFO - Distributed training: False
+2022-11-28 11:11:30,104 - mmedit - INFO - mmedit Version: 0.16.0
+2022-11-28 11:11:30,104 - mmedit - INFO - Config:
+/home3/huangshan/open-mmlab/mmediting/configs/restorers/rdn/rdn_x4c64b16_g1_brain256.py
+exp_name = 'rdn_x4c64b16_g1_100k_div2k'
+
+scale = 1
+# model settings
+model = dict(
+    type='BasicRestorer',
+    generator=dict(
+        type='RDN',
+        in_channels=3,
+        out_channels=3,
+        mid_channels=64,
+        num_blocks=16,
+        upscale_factor=scale),
+    pixel_loss=dict(type='L1Loss', loss_weight=1.0, reduction='mean'))
+# model training and testing settings
+train_cfg = None
+test_cfg = dict(metrics=['PSNR', 'SSIM'], crop_border=scale)
+
+# dataset settings
+train_dataset_type = 'SRFolderDataset'
+val_dataset_type = 'SRFolderDataset'
+train_pipeline = [
+    dict(
+        type='LoadImageFromFile',
+        io_backend='disk',
+        key='lq',
+        flag='color',
+        channel_order='rgb'),
+    dict(
+        type='LoadImageFromFile',
+        io_backend='disk',
+        key='gt',
+        flag='color',
+        channel_order='rgb'),
+    
+    dict(type='RescaleToZeroOne', keys=['lq', 'gt']),
+    dict(type='PairedRandomCrop', gt_patch_size=32),
+    dict(
+        type='Flip', keys=['lq', 'gt'], flip_ratio=0.5,
+        direction='horizontal'),
+    dict(type='Flip', keys=['lq', 'gt'], flip_ratio=0.5, direction='vertical'),
+    dict(type='RandomTransposeHW', keys=['lq', 'gt'], transpose_ratio=0.5),
+    dict(type='Collect', keys=['lq', 'gt'], meta_keys=['lq_path', 'gt_path']),
+    dict(type='ImageToTensor', keys=['lq', 'gt'])
+]
+test_pipeline = [
+    dict(
+        type='LoadImageFromFile',
+        io_backend='disk',
+        key='lq',
+        flag='color',
+        channel_order='rgb'),
+    dict(
+        type='LoadImageFromFile',
+        io_backend='disk',
+        key='gt',
+        flag='color',
+        channel_order='rgb'),
+    dict(type='RescaleToZeroOne', keys=['lq', 'gt']),
+    dict(type='Collect', keys=['lq', 'gt'], meta_keys=['lq_path', 'gt_path']),
+    dict(type='ImageToTensor', keys=['lq', 'gt'])
+]
+
+data = dict(
+    workers_per_gpu=4,
+    train_dataloader=dict(samples_per_gpu=16, drop_last=True),
+    val_dataloader=dict(samples_per_gpu=16),
+    test_dataloader=dict(samples_per_gpu=16),
+    train=dict(
+        type='RepeatDataset',
+        times=1000,
+        dataset=dict(
+            type=train_dataset_type,
+            lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/train_lr3',
+            gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/train_hr3',
+            # ann_file='data/DIV2K/meta_info_DIV2K800sub_GT.txt',
+            pipeline=train_pipeline,
+            scale=scale)),
+    val=dict(
+        type=val_dataset_type,
+        lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_lr3',
+        gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_hr3',
+        pipeline=test_pipeline,
+        scale=scale,
+        filename_tmpl='{}'),
+    test=dict(
+        type=val_dataset_type,
+        lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/test_lr3',
+        gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/test_hr3',
+        pipeline=test_pipeline,
+        scale=scale,
+        filename_tmpl='{}'))
+
+# optimizer
+optimizers = dict(generator=dict(type='Adam', lr=1e-4, betas=(0.9, 0.999)))
+
+# learning policy
+total_iters = 1000000
+lr_config = dict(
+    policy='Step',
+    by_epoch=False,
+    step=[200000, 400000, 600000, 800000],
+    gamma=0.5)
+
+checkpoint_config = dict(interval=5000, save_optimizer=True, by_epoch=False)
+evaluation = dict(interval=5000, save_image=True, gpu_collect=True)
+log_config = dict(
+    interval=100, hooks=[dict(type='TextLoggerHook', by_epoch=False)])
+visual_config = None
+
+# runtime settings
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+work_dir = f'./work_dirs/{exp_name}'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+
+2022-11-28 11:11:30,105 - mmedit - INFO - Set random seed to 362831298, deterministic: False

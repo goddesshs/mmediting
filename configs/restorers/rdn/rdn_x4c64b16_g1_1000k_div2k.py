@@ -105,8 +105,8 @@ lr_config = dict(
     step=[200000, 400000, 600000, 800000],
     gamma=0.5)
 
-checkpoint_config = dict(interval=5, save_optimizer=True, by_epoch=False)
-evaluation = dict(interval=5, save_image=True, gpu_collect=True)
+checkpoint_config = dict(interval=5000, save_optimizer=True, by_epoch=False)
+evaluation = dict(interval=5000, save_image=True, gpu_collect=True)
 log_config = dict(
     interval=100, hooks=[dict(type='TextLoggerHook', by_epoch=False)])
 visual_config = None

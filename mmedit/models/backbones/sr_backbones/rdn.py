@@ -157,8 +157,8 @@ class RDN(nn.Module):
         #             kernel_size=3,
         #             padding=3 // 2), nn.PixelShuffle(upscale_factor))
 
-        # self.output = nn.Conv2d(
-        #     self.mid_channels, out_channels, kernel_size=3, padding=3 // 2)
+        self.output = nn.Conv2d(
+            self.mid_channels, out_channels, kernel_size=3, padding=3 // 2)
 
     def forward(self, x):
         """Forward function.

@@ -1,15 +1,13 @@
-exp_name = 'rdn_x4c64b16_g1_100k_div2k'
+exp_name = 'srcnn_x4k915_g1_1000k_div2k'
 
 scale = 1
 # model settings
 model = dict(
     type='BasicRestorer',
     generator=dict(
-        type='RDN',
-        in_channels=3,
-        out_channels=3,
-        mid_channels=64,
-        num_blocks=16,
+        type='SRCNN',
+        channels=(3, 64, 32, 3),
+        kernel_sizes=(9, 1, 5),
         upscale_factor=scale),
     pixel_loss=dict(type='L1Loss', loss_weight=1.0, reduction='mean'))
 # model training and testing settings
@@ -32,9 +30,10 @@ train_pipeline = [
         key='gt',
         flag='color',
         channel_order='rgb'),
-    
+    dict(type='MATLABLikeResize', keys=['gt', 'lq'], output_shape=(256, 256)),
+    # dict(type='MATLABLikeResize', keys=['lq'], output_shape=(32, 32)),
     dict(type='RescaleToZeroOne', keys=['lq', 'gt']),
-    dict(type='PairedRandomCrop', gt_patch_size=32),
+    dict(type='PairedRandomCrop', gt_patch_size=32, scale=scale),
     dict(
         type='Flip', keys=['lq', 'gt'], flip_ratio=0.5,
         direction='horizontal'),
@@ -56,6 +55,8 @@ test_pipeline = [
         key='gt',
         flag='color',
         channel_order='rgb'),
+    dict(type='MATLABLikeResize', keys=['gt', 'lq'], output_shape=(256, 256)),
+    
     dict(type='RescaleToZeroOne', keys=['lq', 'gt']),
     dict(type='Collect', keys=['lq', 'gt'], meta_keys=['lq_path', 'gt_path']),
     dict(type='ImageToTensor', keys=['lq', 'gt'])
@@ -102,10 +103,10 @@ lr_config = dict(
     step=[200000, 400000, 600000, 800000],
     gamma=0.5)
 
-checkpoint_config = dict(interval=5000, save_optimizer=True, by_epoch=False)
-evaluation = dict(interval=5000, save_image=True, gpu_collect=True)
+checkpoint_config = dict(interval=5, save_optimizer=True, by_epoch=False)
+evaluation = dict(interval=5, save_image=True, gpu_collect=True)
 log_config = dict(
-    interval=100, hooks=[dict(type='TextLoggerHook', by_epoch=False)])
+    interval=5, hooks=[dict(type='TextLoggerHook', by_epoch=False)])
 visual_config = None
 
 # runtime settings
