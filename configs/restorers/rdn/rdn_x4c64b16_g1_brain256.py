@@ -34,7 +34,7 @@ train_pipeline = [
         channel_order='rgb'),
     
     dict(type='RescaleToZeroOne', keys=['lq', 'gt']),
-    dict(type='PairedRandomCrop', gt_patch_size=32),
+    dict(type='PairedRandomCrop', gt_patch_size=32, scale=1),
     dict(
         type='Flip', keys=['lq', 'gt'], flip_ratio=0.5,
         direction='horizontal'),
@@ -63,9 +63,9 @@ test_pipeline = [
 
 data = dict(
     workers_per_gpu=4,
-    train_dataloader=dict(samples_per_gpu=16, drop_last=True),
-    val_dataloader=dict(samples_per_gpu=16),
-    test_dataloader=dict(samples_per_gpu=16),
+    train_dataloader=dict(samples_per_gpu=8, drop_last=True),
+    val_dataloader=dict(samples_per_gpu=1),
+    test_dataloader=dict(samples_per_gpu=1),
     train=dict(
         type='RepeatDataset',
         times=1000,
@@ -75,35 +75,44 @@ data = dict(
             gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/train_hr3',
             # ann_file='data/DIV2K/meta_info_DIV2K800sub_GT.txt',
             pipeline=train_pipeline,
-            scale=scale)),
+            scale=scale,
+            ratio=0.3)),
     val=dict(
         type=val_dataset_type,
         lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_lr3',
         gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_hr3',
         pipeline=test_pipeline,
         scale=scale,
-        filename_tmpl='{}'),
+        filename_tmpl='{}',
+        traio=0.3),
     test=dict(
         type=val_dataset_type,
         lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/test_lr3',
         gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/test_hr3',
         pipeline=test_pipeline,
         scale=scale,
-        filename_tmpl='{}'))
+        filename_tmpl='{}',
+        ratio=0.3))
 
 # optimizer
 optimizers = dict(generator=dict(type='Adam', lr=1e-4, betas=(0.9, 0.999)))
 
 # learning policy
-total_iters = 1000000
+# total_iters = 1000000
+# lr_config = dict(
+#     policy='Step',
+#     by_epoch=False,
+#     step=[200000, 400000, 600000, 800000],
+#     gamma=0.5)
+total_iters = 500000
 lr_config = dict(
     policy='Step',
     by_epoch=False,
-    step=[200000, 400000, 600000, 800000],
+    step=[100000, 200000, 300000, 400000],
     gamma=0.5)
 
 checkpoint_config = dict(interval=5000, save_optimizer=True, by_epoch=False)
-evaluation = dict(interval=5000, save_image=True, gpu_collect=True)
+evaluation = dict(interval=5000, save_image=True)
 log_config = dict(
     interval=100, hooks=[dict(type='TextLoggerHook', by_epoch=False)])
 visual_config = None

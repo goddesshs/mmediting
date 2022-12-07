@@ -1,4 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import glob
+import os
 import os.path as osp
 
 from .base_sr_dataset import BaseSRDataset
@@ -73,21 +75,30 @@ class SRFolderDataset(BaseSRDataset):
             list[dict]: A list of dicts for paired paths of LQ and GT.
         """
         data_infos = []
-        lq_paths = self.scan_folder(self.lq_folder)
-        gt_paths = self.scan_folder(self.gt_folder)
-        # lq_path = lq_path[:100000]
-        # gt_pat
-        assert len(lq_paths) == len(gt_paths), (
-            f'gt and lq datasets have different number of images: '
-            f'{len(lq_paths)}, {len(gt_paths)}.')
+        lq_paths = glob.glob(os.path.join(self.lq_folder, '*.png'))
+        gt_paths = glob.glob(os.path.join(self.lq_folder, '*.png'))
         length = int(self.ratio * len(gt_paths))
-        for i in range(length):
-            gt_path = gt_paths[i]
-        # for gt_path in gt_paths:
-            basename, ext = osp.splitext(osp.basename(gt_path))
-            lq_path = osp.join(self.lq_folder,
-                               (f'{self.filename_tmpl.format(basename)}'
-                                f'{ext}'))
-            assert lq_path in lq_paths, f'{lq_path} is not in lq_paths.'
+        gt_paths = gt_paths[:length]
+        for gt_path in gt_paths:
+            img_name = osp.basename(gt_path)
+            lq_path = osp.join(self.lq_folder, img_name)
             data_infos.append(dict(lq_path=lq_path, gt_path=gt_path))
+        # lq_paths = self.scan_folder(self.lq_folder)
+        # gt_paths = self.scan_folder(self.gt_folder)
+        # # lq_path = lq_path[:100000]
+        # # gt_pat
+        # assert len(lq_paths) == len(gt_paths), (
+        #     f'gt and lq datasets have different number of images: '
+        #     f'{len(lq_paths)}, {len(gt_paths)}.')
+        # length = int(self.ratio * len(gt_paths))
+        # for i in range(length):
+        #     gt_path = gt_paths[i]
+        # # for gt_path in gt_paths:
+        #     basename, ext = osp.splitext(osp.basename(gt_path))
+        #     lq_path = osp.join(self.lq_folder,
+        #                        (f'{self.filename_tmpl.format(basename)}'
+        #                         f'{ext}'))
+        #     assert lq_path in lq_paths, f'{lq_path} is not in lq_paths.'
+        #     data_infos.append(dict(lq_path=lq_path, gt_path=gt_path))
+        print('ddd', data_infos)
         return data_infos
