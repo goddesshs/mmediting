@@ -1,0 +1,331 @@
+Could not find conda environment: open-mmlabpy31
+You can list all discoverable environments with `conda info --envs`.
+
+/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/mmcv/__init__.py:20: UserWarning: On January 1, 2023, MMCV will release v2.0.0, in which it will remove components related to the training process and add a data transformation module. In addition, it will rename the package names mmcv to mmcv-lite and mmcv-full to mmcv. See https://github.com/open-mmlab/mmcv/blob/master/docs/en/compatibility.md for more details.
+  warnings.warn(
+/dssg/home/acct-seesb/seesb-user1/hs/open-mmlab/mmediting/mmedit/utils/setup_env.py:32: UserWarning: Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed.
+  warnings.warn(
+/dssg/home/acct-seesb/seesb-user1/hs/open-mmlab/mmediting/mmedit/utils/setup_env.py:42: UserWarning: Setting MKL_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed.
+  warnings.warn(
+2022-12-07 15:28:30,581 - mmedit - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.10.4 (main, Mar 31 2022, 08:41:55) [GCC 7.5.0]
+CUDA available: True
+GPU 0: NVIDIA A100-SXM4-40GB
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 11.5, V11.5.119
+GCC: gcc (GCC) 8.3.1 20191121 (Red Hat 8.3.1-5)
+PyTorch: 1.12.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201402
+  - Intel(R) oneAPI Math Kernel Library Version 2021.4-Product Build 20210904 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.6.0 (Git Hash 52b5f107dd9cf10910aaa19cb47f3abf9b349815)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.3
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86;-gencode;arch=compute_37,code=compute_37
+  - CuDNN 8.3.2  (built against CUDA 11.5)
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.3, CUDNN_VERSION=8.3.2, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.12.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=OFF, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+TorchVision: 0.13.0
+OpenCV: 4.6.0
+MMCV: 1.7.0
+MMCV Compiler: GCC 9.3
+MMCV CUDA Compiler: 11.3
+MMEditing: 0.16.0+afd0644
+------------------------------------------------------------
+
+2022-12-07 15:28:30,582 - mmedit - INFO - Distributed training: False
+2022-12-07 15:28:30,584 - mmedit - INFO - mmedit Version: 0.16.0
+2022-12-07 15:28:30,584 - mmedit - INFO - Config:
+/dssg/home/acct-seesb/seesb-user1/hs/open-mmlab/mmediting/configs/restorers/glean/glean_brain256.py
+exp_name = 'glean_brain_256_256'
+
+scale = 8
+# model settings
+model = dict(
+    type='GLEAN',
+    generator=dict(
+        type='GLEANStyleGANv2FuC',
+        in_size=256,
+        out_size=256,
+        style_channels=512,
+        pretrained=dict(
+            ckpt_path='./pretrained_model/glean/best_fid_iter_80000.pth',
+            prefix='generator_ema')),
+    discriminator=dict(
+        type='StyleGAN2Discriminator',
+        in_size=256,
+        pretrained=dict(
+            ckpt_path='./pretrained_model/glean/best_fid_iter_80000.pth',
+            prefix='discriminator')),
+    pixel_loss=dict(type='MSELoss', loss_weight=1.0, reduction='mean'),
+    perceptual_loss=dict(
+        type='PerceptualLoss',
+        layer_weights={'21': 1.0},
+        vgg_type='vgg16',
+        perceptual_weight=1e-2,
+        style_weight=0,
+        norm_img=False,
+        criterion='mse',
+        pretrained='torchvision://vgg16'),
+    gan_loss=dict(
+        type='GANLoss',
+        gan_type='vanilla',
+        loss_weight=1e-2,
+        real_label_val=1.0,
+        fake_label_val=0),
+    pretrained=None,
+)
+# model training and testing settings
+train_cfg = None
+test_cfg = dict(metrics=['PSNR', 'SSIM'], crop_border=0)
+
+# dataset settings
+train_dataset_type = 'SRFolderDataset'
+val_dataset_type = 'SRFolderDataset'
+test_dataset_type = 'SRH5pyDataset'
+train_pipeline = [
+    dict(
+        type='LoadImageFromFile',
+        io_backend='disk',
+        key='lq',
+        flag='color',
+        channel_order='rgb'),
+    dict(
+        type='LoadImageFromFile',
+        io_backend='disk',
+        key='gt',
+        flag='color',
+        channel_order='rgb'),
+    dict(type='MATLABLikeResize', keys=['gt'], output_shape=(256, 256)),
+    dict(type='MATLABLikeResize', keys=['lq'], output_shape=(256, 256)),
+    dict(type='RescaleToZeroOne', keys=['lq', 'gt']),
+    dict(
+        type='Flip', keys=['lq', 'gt'], flip_ratio=0.5,
+        direction='horizontal'),
+    dict(type='Flip', keys=['lq', 'gt'], flip_ratio=0.5, direction='vertical'),
+    dict(type='RandomTransposeHW', keys=['lq', 'gt'], transpose_ratio=0.5),
+    dict(type='Collect', keys=['lq', 'gt'], meta_keys=['lq_path', 'gt_path']),
+    dict(type='ImageToTensor', keys=['lq', 'gt'])
+]
+test_pipeline = [
+    dict(
+        type='LoadImageFromFile',
+        io_backend='disk',
+        key='lq',
+        flag='color',
+        channel_order='rgb'),
+    dict(
+        type='LoadImageFromFile',
+        io_backend='disk',
+        key='gt',
+        flag='color',
+        channel_order='rgb'),
+    dict(type='MATLABLikeResize', keys=['gt'], output_shape=(256, 256)),
+    dict(type='MATLABLikeResize', keys=['lq'], output_shape=(256, 256)),
+    dict(type='RescaleToZeroOne', keys=['lq', 'gt']),
+    dict(type='Collect', keys=['lq', 'gt'], meta_keys=['lq_path', 'gt_path']),
+    dict(type='ImageToTensor', keys=['lq', 'gt'])
+]
+real_pipeline=[
+    dict(
+        type='LoadImageFromFile',
+        io_backend='disk',
+        key='lq',
+        flag='color',
+        channel_order='rgb'),
+    dict(type='MATLABLikeResize', keys=['lq'], output_shape=(256, 256)),
+    dict(type='RescaleToZeroOne', keys=['lq']),
+    dict(type='Collect', keys=['lq'], meta_keys=['lq_path']),
+    dict(type='ImageToTensor', keys=['lq'])
+]
+
+# test_pipeline = [
+#     dict(type='LoadImageFromFile', io_backend='disk', key='lq'),
+#     dict(type='LoadImageFromFile', io_backend='disk', key='gt'),
+#     # dict(type='MATLABLikeResize', keys=['gt'], output_shape=(256, 256)),
+#     dict(type='MATLABLikeResize', keys=['lq'], output_shape=(32, 32)),
+#     dict(type='RescaleToZeroOne', keys=['lq']),
+#     dict(
+#         type='Normalize',
+#         keys=['lq'],
+#         mean=[0.5, 0.5, 0.5],
+#         std=[0.5, 0.5, 0.5],
+#         to_rgb=True),
+#     dict(type='ImageToTensor', keys=['lq']),
+# ]
+
+data = dict(
+    workers_per_gpu=4,
+    train_dataloader=dict(samples_per_gpu=6, drop_last=True),
+    val_dataloader=dict(samples_per_gpu=6),
+    test_dataloader=dict(samples_per_gpu=6),
+    train=dict(
+        type='RepeatDataset',
+        times=1000,
+        dataset=dict(
+            type=train_dataset_type,
+            lq_folder='/dssg/home/acct-seesb/seesb-user1/hs/hualiao_mri/mri_rot_imgs/1/lr',
+            gt_folder='/dssg/home/acct-seesb/seesb-user1/hs/hualiao_mri/mri_rot_imgs/1/hr',
+            # ann_file='data/DIV2K/meta_info_DIV2K800sub_GT.txt',
+            pipeline=train_pipeline,
+            scale=scale,
+            ratio1=0,
+            ratio2=0.25)),
+    val=dict(
+        type=val_dataset_type,
+        lq_folder='/dssg/home/acct-seesb/seesb-user1/hs/hualiao_mri/mri_rot_imgs/1/lr',
+            gt_folder='/dssg/home/acct-seesb/seesb-user1/hs/hualiao_mri/mri_rot_imgs/1/hr',
+        pipeline=test_pipeline,
+        scale=scale,
+        filename_tmpl='{}',
+        ratio1=0.8,
+        ratio2=0.85),
+    test=dict(
+        type=val_dataset_type,
+        lq_folder='/dssg/home/acct-seesb/seesb-user1/hs/hualiao_mri/mri_rot_imgs/1/lr',
+        gt_folder='/dssg/home/acct-seesb/seesb-user1/hs/hualiao_mri/mri_rot_imgs/1/hr',
+        # lq_folder='/home3/huangshan/dataset/hcp_imgs/3/2/lr',
+        # gt_folder='/home3/huangshan/dataset/hcp_imgs/3/2/hr',
+        pipeline=test_pipeline,
+        scale=scale,
+        filename_tmpl='{}',
+        ratio=0.06))
+
+# optimizer
+optimizers = dict(
+    generator=dict(type='Adam', lr=1e-4, betas=(0.9, 0.99)),
+    discriminator=dict(type='Adam', lr=1e-4, betas=(0.9, 0.99)))
+
+# learning policy
+total_iters = 300000
+lr_config = dict(
+    policy='CosineRestart',
+    by_epoch=False,
+    periods=[300000],
+    restart_weights=[1],
+    min_lr=1e-7)
+
+checkpoint_config = dict(interval=5000, save_optimizer=True, by_epoch=False)
+evaluation = dict(interval=5000, save_image=False)
+log_config = dict(
+    interval=2,
+    hooks=[
+        dict(type='TextLoggerHook', by_epoch=False),
+        # dict(type='TensorboardLoggerHook'),
+    ])
+visual_config = None
+
+# runtime settings
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+work_dir = f'./work_dirs/{exp_name}'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+find_unused_parameters = True
+
+2022-12-07 15:28:30,586 - mmedit - INFO - Set random seed to 736998739, deterministic: False
+2022-12-07 15:28:34,098 - mmedit - INFO - Load pretrained model from ./pretrained_model/glean/best_fid_iter_80000.pth
+2022-12-07 15:28:35,546 - mmedit - INFO - Load pretrained model from ./pretrained_model/glean/best_fid_iter_80000.pth
+2022-12-07 15:28:36,875 - mmedit - INFO - load checkpoint from torchvision path: torchvision://vgg16
+2022-12-07 15:28:47,731 - mmedit - INFO - Start running, host: seesb-user1@gpu20.pi.sjtu.edu.cn, work_dir: /dssg/home/acct-seesb/seesb-user1/hs/open-mmlab/mmediting/work_dirs/glean_brain_256_256
+2022-12-07 15:28:47,731 - mmedit - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) CosineRestartLrUpdaterHook         
+(NORMAL      ) CheckpointHook                     
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) CosineRestartLrUpdaterHook         
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) CosineRestartLrUpdaterHook         
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalIterHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2022-12-07 15:28:47,732 - mmedit - INFO - workflow: [('train', 1)], max: 300000 iters
+2022-12-07 15:28:47,732 - mmedit - INFO - Checkpoints will be saved to /dssg/home/acct-seesb/seesb-user1/hs/open-mmlab/mmediting/work_dirs/glean_brain_256_256 by HardDiskBackend.
+Traceback (most recent call last):
+  File "/dssg/home/acct-seesb/seesb-user1/hs/open-mmlab/mmediting/tools/train.py", line 170, in <module>
+    main()
+  File "/dssg/home/acct-seesb/seesb-user1/hs/open-mmlab/mmediting/tools/train.py", line 159, in main
+    train_model(
+  File "/dssg/home/acct-seesb/seesb-user1/hs/open-mmlab/mmediting/mmedit/apis/train.py", line 106, in train_model
+    _non_dist_train(
+  File "/dssg/home/acct-seesb/seesb-user1/hs/open-mmlab/mmediting/mmedit/apis/train.py", line 362, in _non_dist_train
+    runner.run(data_loaders, cfg.workflow, cfg.total_iters)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/mmcv/runner/iter_based_runner.py", line 144, in run
+    iter_runner(iter_loaders[i], **kwargs)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/mmcv/runner/iter_based_runner.py", line 64, in train
+    outputs = self.model.train_step(data_batch, self.optimizer, **kwargs)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/mmcv/parallel/data_parallel.py", line 77, in train_step
+    return self.module.train_step(*inputs[0], **kwargs[0])
+  File "/dssg/home/acct-seesb/seesb-user1/hs/open-mmlab/mmediting/mmedit/models/restorers/srgan.py", line 115, in train_step
+    fake_g_output = self.generator(lq)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/dssg/home/acct-seesb/seesb-user1/hs/open-mmlab/mmediting/mmedit/models/backbones/sr_backbones/glean_styleganv2_in_out_eq.py", line 219, in forward
+    feat = block(feat)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/dssg/home/acct-seesb/seesb-user1/hs/open-mmlab/mmediting/mmedit/models/backbones/sr_backbones/glean_styleganv2_in_out_eq.py", line 336, in forward
+    return feat + self.conv_body(self.body(feat))
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/dssg/home/acct-seesb/seesb-user1/hs/open-mmlab/mmediting/mmedit/models/backbones/sr_backbones/glean_styleganv2_in_out_eq.py", line 404, in forward
+    out = self.conv1(x)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/basicsr/ops/fused_act/fused_act.py", line 91, in forward
+    return fused_leaky_relu(input, self.bias, self.negative_slope, self.scale)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/basicsr/ops/fused_act/fused_act.py", line 95, in fused_leaky_relu
+    return FusedLeakyReLUFunction.apply(input, bias, negative_slope, scale)
+  File "/dssg/home/acct-seesb/seesb-user1/.conda/envs/open-mmlabpy310/lib/python3.10/site-packages/basicsr/ops/fused_act/fused_act.py", line 65, in forward
+    out = fused_act_ext.fused_bias_act(input, bias, empty, 3, 0, negative_slope, scale)
+NameError: name 'fused_act_ext' is not defined

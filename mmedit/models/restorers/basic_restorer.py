@@ -1,5 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import numbers
+import os
 import os.path as osp
 
 import mmcv
@@ -9,7 +10,7 @@ from mmedit.core import psnr, ssim, tensor2img
 from ..base import BaseModel
 from ..builder import build_backbone, build_loss
 from ..registry import MODELS
-
+import numpy as np
 
 @MODELS.register_module()
 class BasicRestorer(BaseModel):
@@ -106,16 +107,18 @@ class BasicRestorer(BaseModel):
         Returns:
             dict: Evaluation results.
         """
+        resutls = []
         crop_border = self.test_cfg.crop_border
-
-        output = tensor2img(output)
-        gt = tensor2img(gt)
-
-        eval_result = dict()
-        for metric in self.test_cfg.metrics:
-            eval_result[metric] = self.allowed_metrics[metric](output, gt,
-                                                               crop_border)
-        return eval_result
+        for i in range(gt.shape[0]):
+            o = tensor2img(output[i,:,:,:])
+            g = tensor2img(gt[i,:,:,:])
+            if np.any(o):
+                eval_result = dict()
+                for metric in self.test_cfg.metrics:
+                    eval_result[metric] = self.allowed_metrics[metric](o, g,
+                                                                    crop_border)
+                resutls.append(dict(eval_result=eval_result))
+        return resutls
 
     def forward_test(self,
                      lq,
@@ -138,28 +141,59 @@ class BasicRestorer(BaseModel):
             dict: Output results.
         """
         output = self.generator(lq)
+        # normalize from [-1, 1] to [0, 1]
+        # output = (output + 1) / 2.0
         if self.test_cfg is not None and self.test_cfg.get('metrics', None):
             assert gt is not None, (
                 'evaluation with metrics must have gt images.')
-            results = dict(eval_result=self.evaluate(output, gt))
+            # results = dict(eval_result=self.evaluate(output, gt))
+            results = self.evaluate(output, gt)
         else:
-            results = dict(lq=lq.cpu(), output=output.cpu())
+            results = []
+            result = dict(lq=lq.cpu(), output=output.cpu())
             if gt is not None:
-                results['gt'] = gt.cpu()
+                result['gt'] = gt.cpu()
+            results.append(result)
 
         # save image
         if save_image:
-            lq_path = meta[0]['lq_path']
-            folder_name = osp.splitext(osp.basename(lq_path))[0]
-            if isinstance(iteration, numbers.Number):
-                save_path = osp.join(save_path, folder_name,
-                                     f'{folder_name}-{iteration + 1:06d}.png')
-            elif iteration is None:
-                save_path = osp.join(save_path, f'{folder_name}.png')
-            else:
-                raise ValueError('iteration should be number or None, '
-                                 f'but got {type(iteration)}')
-            mmcv.imwrite(tensor2img(output), save_path)
+            # if save_image:
+            for i in range(output.shape[0]):
+                o = tensor2img(output[i, :, :, :])
+                l = tensor2img(lq[i, :, :, :])
+                f= save_path.rsplit('_', 1)[0]
+                lq_folder_name = f+ '_lr'
+                gt_folder_name = f + '_gthr'
+                # lq_path = os.path.join()
+                if not os.path.exists(lq_folder_name):
+                    os.makedirs(lq_folder_name)
+                if not os.path.exists(gt_folder_name):
+                    os.makedirs(gt_folder_name)
+                lq_path = meta[i]['lq_path']
+                folder_name = osp.splitext(osp.basename(lq_path))[0]
+                # if isinstance(iteration, numbers.Number):
+                #     save_path = osp.join(save_path, folder_name,
+                #                         f'{folder_name}-{iteration + 1:06d}.png')
+                # elif iteration is None:
+                #     save_path = osp.join(save_path, f'{folder_name}.png')
+                # else:
+                #     raise ValueError('iteration should be number or None, '
+                #                     f'but got {type(iteration)}')
+                mmcv.imwrite(o, osp.join(save_path, f'{folder_name}.png'))
+                if gt is not None:
+                    g = tensor2img(gt[i, :, :, :])
+                    mmcv.imwrite(g, osp.join(gt_folder_name, f'{folder_name}.png'))
+                mmcv.imwrite(l, osp.join(lq_folder_name, f'{folder_name}.png'))
+                
+            # if isinstance(iteration, numbers.Number):
+            #     save_path = osp.join(save_path, folder_name,
+            #                          f'{folder_name}-{iteration + 1:06d}.png')
+            # elif iteration is None:
+            #     save_path = osp.join(save_path, f'{folder_name}.png')
+            # else:
+            #     raise ValueError('iteration should be number or None, '
+            #                      f'but got {type(iteration)}')
+            # mmcv.imwrite(tensor2img(output), save_path)
 
         return results
 

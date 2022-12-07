@@ -63,9 +63,15 @@ test_pipeline = [
 
 data = dict(
     workers_per_gpu=4,
+<<<<<<< HEAD
     train_dataloader=dict(samples_per_gpu=8, drop_last=True),
     val_dataloader=dict(samples_per_gpu=1),
     test_dataloader=dict(samples_per_gpu=1),
+=======
+    train_dataloader=dict(samples_per_gpu=16, drop_last=True),
+    val_dataloader=dict(samples_per_gpu=16),
+    test_dataloader=dict(samples_per_gpu=16),
+>>>>>>> origin/sr_woup
     train=dict(
         type='RepeatDataset',
         times=1000,
@@ -112,7 +118,11 @@ lr_config = dict(
     gamma=0.5)
 
 checkpoint_config = dict(interval=5000, save_optimizer=True, by_epoch=False)
+<<<<<<< HEAD
 evaluation = dict(interval=5000, save_image=True)
+=======
+evaluation = dict(interval=5000, save_image=True, gpu_collect=True)
+>>>>>>> origin/sr_woup
 log_config = dict(
     interval=100, hooks=[dict(type='TextLoggerHook', by_epoch=False)])
 visual_config = None

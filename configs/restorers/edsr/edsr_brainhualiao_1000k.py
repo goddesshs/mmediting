@@ -87,7 +87,11 @@ data = dict(
         pipeline=test_pipeline,
         scale=scale,
         filename_tmpl='{}',
+<<<<<<< HEAD
         traio=0.3),
+=======
+        ratio=0.3),
+>>>>>>> origin/sr_woup
     test=dict(
         type=val_dataset_type,
         lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/test_lr3',
@@ -101,6 +105,7 @@ data = dict(
 optimizers = dict(generator=dict(type='Adam', lr=1e-4, betas=(0.9, 0.999)))
 
 # learning policy
+<<<<<<< HEAD
 # total_iters = 1000000
 # lr_config = dict(
 #     policy='Step',
@@ -116,6 +121,17 @@ lr_config = dict(
 
 checkpoint_config = dict(interval=5, save_optimizer=True, by_epoch=False)
 evaluation = dict(interval=5, save_image=True)
+=======
+total_iters = 1000000
+lr_config = dict(
+    policy='Step',
+    by_epoch=False,
+    step=[200000, 400000, 600000, 800000],
+    gamma=0.5)
+
+checkpoint_config = dict(interval=5000, save_optimizer=True, by_epoch=False)
+evaluation = dict(interval=5000, save_image=True, gpu_collect=True)
+>>>>>>> origin/sr_woup
 log_config = dict(
     interval=100, hooks=[dict(type='TextLoggerHook', by_epoch=False)])
 visual_config = None

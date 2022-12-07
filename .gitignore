@@ -4,7 +4,22 @@ __pycache__/
 *$py.class
 **/*.pyc
 #
+<<<<<<< HEAD
 results/
+=======
+*.out
+results/
+data/
+*.slurm
+*.err
+
+#
+/results
+#
+.out 
+
+
+>>>>>>> origin/sr_woup
 # zip
 *.zip
 # C extensions
