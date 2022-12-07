@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 **/*.pyc
+#
+*.out
+results/
+data/
+*.slurm
+*.err
 
 # zip
 *.zip
