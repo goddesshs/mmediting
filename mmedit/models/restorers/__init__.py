@@ -5,6 +5,7 @@ from .dic import DIC
 from .edvr import EDVR
 from .esrgan import ESRGAN
 from .glean import GLEAN
+from .gfpgan import GFPGAN
 from .liif import LIIF
 from .real_basicvsr import RealBasicVSR
 from .real_esrgan import RealESRGAN
@@ -14,5 +15,5 @@ from .ttsr import TTSR
 
 __all__ = [
     'BasicRestorer', 'SRGAN', 'ESRGAN', 'EDVR', 'LIIF', 'BasicVSR', 'TTSR',
-    'GLEAN', 'TDAN', 'DIC', 'RealESRGAN', 'RealBasicVSR'
+    'GLEAN', 'TDAN', 'DIC', 'RealESRGAN', 'RealBasicVSR', 'GFPGAN'
 ]

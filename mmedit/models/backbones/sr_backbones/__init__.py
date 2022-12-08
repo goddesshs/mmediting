@@ -6,6 +6,7 @@ from .edsr import EDSR
 from .edvr_net import EDVRNet
 from .glean_styleganv2 import GLEANStyleGANv2
 from .glean_styleganv2_in_out_eq import GLEANStyleGANv2FuC
+from .gfpgan_styleganv2 import GFPGANv1
 from .iconvsr import IconVSR
 from .liif_net import LIIFEDSR, LIIFRDN
 from .rdn import RDN
@@ -21,5 +22,5 @@ from .ttsr_net import TTSRNet
 __all__ = [
     'MSRResNet', 'RRDBNet', 'EDSR', 'EDVRNet', 'TOFlow', 'SRCNN', 'DICNet',
     'BasicVSRNet', 'IconVSR', 'RDN', 'TTSRNet', 'GLEANStyleGANv2', 'TDANNet',
-    'LIIFEDSR', 'LIIFRDN', 'BasicVSRPlusPlus', 'RealBasicVSRNet', 'GLEANStyleGanv2FuC'
+    'LIIFEDSR', 'LIIFRDN', 'BasicVSRPlusPlus', 'RealBasicVSRNet', 'GLEANStyleGanv2FuC', 'GFPGANv1',
 ]

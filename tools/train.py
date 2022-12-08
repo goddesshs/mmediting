@@ -2,7 +2,10 @@
 import argparse
 import copy
 import os
-# os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+# os.environ['']
+print(os.getenv('CXX'))
+os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+print(os.getenv('CUDA_VISIBLE_DEVICES'))
 import os.path as osp
 import time
 

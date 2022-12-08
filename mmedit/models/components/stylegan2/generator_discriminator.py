@@ -12,6 +12,9 @@ from .common import get_mean_latent, get_module_device, style_mixing
 from .modules import (ConstantInput, ConvDownLayer, EqualLinearActModule,
                       ModMBStddevLayer, ModulatedStyleConv, ModulatedToRGB,
                       PixelNorm, ResBlock)
+
+
+
 @COMPONENTS.register_module()
 
 class StyleGANv2Generator(nn.Module):
@@ -82,6 +85,7 @@ class StyleGANv2Generator(nn.Module):
                  out_size,
                  style_channels,
                  num_mlps=8,
+                #  pretrained=None,
                  channel_multiplier=2,
                  blur_kernel=[1, 3, 3, 1],
                  lr_mlp=0.01,
@@ -400,6 +404,133 @@ class StyleGANv2Generator(nn.Module):
             return output_dict
         else:
             return img
+
+
+@COMPONENTS.register_module()
+class StyleGAN2GeneratorSFT(StyleGANv2Generator):
+    """StyleGAN2 Generator with SFT modulation (Spatial Feature Transform).
+
+    Args:
+        out_size (int): The spatial size of outputs.
+        num_style_feat (int): Channel number of style features. Default: 512.
+        num_mlp (int): Layer number of MLP style layers. Default: 8.
+        channel_multiplier (int): Channel multiplier for large networks of StyleGAN2. Default: 2.
+        resample_kernel (list[int]): A list indicating the 1D resample kernel magnitude. A cross production will be
+            applied to extent 1D resample kernel to 2D resample kernel. Default: (1, 3, 3, 1).
+        lr_mlp (float): Learning rate multiplier for mlp layers. Default: 0.01.
+        narrow (float): The narrow ratio for channels. Default: 1.
+        sft_half (bool): Whether to apply SFT on half of the input channels. Default: False.
+    """
+
+    def __init__(self,
+                 out_size,
+                 pretrained=None,
+                 style_channels=512,
+                 num_mlp=8,
+                 channel_multiplier=2,
+                 blur_kernel=(1, 3, 3, 1),
+                 lr_mlp=0.01,
+                 narrow=1,
+                 sft_half=False):
+        super(StyleGAN2GeneratorSFT, self).__init__(
+            out_size,
+            pretrained=pretrained,
+            style_channels=style_channels,
+            num_mlps=num_mlp,
+            channel_multiplier=channel_multiplier,
+            blur_kernel=blur_kernel,
+            lr_mlp=lr_mlp)
+        self.sft_half = sft_half
+
+    def forward(self,
+                styles,
+                conditions,
+                return_noise=False,
+                noise=None,
+                return_latents=False,
+                inject_index=None,
+                truncation=1,
+                truncation_latent=None,
+                input_is_latent=False,
+                injected_noise=None,
+                randomize_noise=True):
+        """Forward function for StyleGAN2GeneratorSFT.
+
+        Args:
+            styles (list[Tensor]): Sample codes of styles.
+            conditions (list[Tensor]): SFT conditions to generators.
+            input_is_latent (bool): Whether input is latent style. Default: False.
+            noise (Tensor | None): Input noise or None. Default: None.
+            randomize_noise (bool): Randomize noise, used when 'noise' is False. Default: True.
+            truncation (float): The truncation ratio. Default: 1.
+            truncation_latent (Tensor | None): The truncation latent tensor. Default: None.
+            inject_index (int | None): The injection index for mixing noise. Default: None.
+            return_latents (bool): Whether to return style latents. Default: False.
+        """
+        # style codes -> latents with Style MLP layer
+        # receive noise and conduct sanity check.
+        # style codes -> latents with Style MLP layer
+        if not input_is_latent:
+            styles = [self.style_mapping(s) for s in styles]
+        # noises
+        if noise is None:
+            if randomize_noise:
+                noise = [None] * self.num_injected_noises  # for each style conv layer
+            else:  # use the stored noise
+                noise = [getattr(self, f'injected_noise_{i}')
+            for i in range(self.num_injected_noises)]
+        # style truncation
+        if truncation < 1:
+            style_truncation = []
+            for style in styles:
+                style_truncation.append(truncation_latent + truncation * (style - truncation_latent))
+            styles = style_truncation
+        # get style latents with injection
+        if len(styles) == 1:
+            inject_index = self.num_latents
+
+            if styles[0].ndim < 3:
+                # repeat latent code for all the layers
+                latent = styles[0].unsqueeze(1).repeat(1, inject_index, 1)
+            else:  # used for encoder with different latent code for each layer
+                latent = styles[0]
+        elif len(styles) == 2:  # mixing noises
+            if inject_index is None:
+                inject_index = random.randint(1, self.num_latents - 1)
+            latent1 = styles[0].unsqueeze(1).repeat(1, inject_index, 1)
+            latent2 = styles[1].unsqueeze(1).repeat(1, self.num_latents - inject_index, 1)
+            latent = torch.cat([latent1, latent2], 1)
+
+        # main generation
+        out = self.constant_input(latent)
+        out = self.conv1(out, latent[:, 0], noise=noise[0])
+        skip = self.to_rgb1(out, latent[:, 1])
+
+        i = 1
+        for conv1, conv2, noise1, noise2, to_rgb in zip(self.convs[::2], self.convs[1::2], noise[1::2],
+                                                        noise[2::2], self.to_rgbs):
+            out = conv1(out, latent[:, i], noise=noise1) #F-GAN
+
+            # the conditions may have fewer levels
+            if i < len(conditions):
+                # SFT part to combine the conditions
+                if self.sft_half:  # only apply SFT to half of the channels
+                    out_same, out_sft = torch.split(out, int(out.size(1) // 2), dim=1)
+                    out_sft = out_sft * conditions[i - 1] + conditions[i]
+                    out = torch.cat([out_same, out_sft], dim=1)
+                else:  # apply SFT to all the channels
+                    out = out * conditions[i - 1] + conditions[i] #F-Spatial
+
+            out = conv2(out, latent[:, i + 1], noise=noise2)
+            skip = to_rgb(out, latent[:, i + 2], skip)  # feature back to the rgb space
+            i += 2
+
+        image = skip
+
+        if return_latents:
+            return image, latent
+        else:
+            return image, None
 
 
 @COMPONENTS.register_module()

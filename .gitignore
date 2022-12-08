@@ -3,8 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 **/*.pyc
-#
-<<<<<<< HEAD
+*.err
 results/
 =======
 *.out
@@ -12,14 +11,11 @@ results/
 data/
 *.slurm
 *.err
-
+configs/
 #
 /results
 #
-.out 
-
-
->>>>>>> origin/sr_woup
+*.out
 # zip
 *.zip
 # C extensions

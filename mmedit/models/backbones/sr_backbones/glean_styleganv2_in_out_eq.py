@@ -10,7 +10,9 @@ from mmedit.models.builder import build_component
 from mmedit.models.common import PixelShufflePack, make_layer
 from mmedit.models.registry import BACKBONES
 from mmedit.utils import get_root_logger
-from basicsr.ops.fused_act import FusedLeakyReLU, fused_leaky_relu
+from mmcv.ops.fused_bias_leakyrelu import (FusedBiasLeakyReLU,
+                                           fused_bias_leakyrelu)
+# from basicsr.ops.fused_act import FusedLeakyReLU, fused_leaky_relu
 from basicsr.ops.upfirdn2d import upfirdn2d
 import torch.nn.functional as F
 
@@ -303,7 +305,7 @@ class ResFeatureExtractor(nn.Module):
     def __init__(self,
                  in_channels=3,
                  mid_channels=64,
-                 num_blocks=23,
+                 num_blocks=12,
                  blur_kernel=(1,3,3,1),
                  growth_channels=32):
 
@@ -311,7 +313,7 @@ class ResFeatureExtractor(nn.Module):
         self.conv_first = nn.Conv2d(in_channels, mid_channels, 3, 1, 1)
         
         layers = []
-        for i in range(num_blocks):
+        for _ in range(num_blocks):
             layers.append(ResBlock(mid_channels, mid_channels, resample_kernel=blur_kernel, downsample=False))
         # self.conv_first = nn.Conv2d(in_channels, mid_channels, 3, 1, 1)
         self.body = nn.Sequential(*layers)
@@ -567,7 +569,7 @@ class ConvLayer(nn.Sequential):
         # activation
         if activate:
             if bias:
-                layers.append(FusedLeakyReLU(out_channels))
+                layers.append(FusedBiasLeakyReLU(out_channels))
             else:
                 layers.append(ScaledLeakyReLU(0.2))
 

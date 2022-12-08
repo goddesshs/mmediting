@@ -46,7 +46,7 @@ def single_gpu_test(model,
                 save_path=save_path,
                 iteration=iteration,
                 **data)
-        results.append(result)
+        results.extend(result)
 
         # get batch size
         for _, v in data.items():

@@ -58,22 +58,14 @@ class SRFolderDataset(BaseSRDataset):
                  scale,
                  test_mode=False,
                  filename_tmpl='{}',
-<<<<<<< HEAD
-                 ratio=1):
-=======
                  ratio1=0,
                  ratio2=1):
->>>>>>> origin/sr_woup
         super().__init__(pipeline, scale, test_mode)
         self.lq_folder = str(lq_folder)
         self.gt_folder = str(gt_folder)
         self.filename_tmpl = filename_tmpl
-<<<<<<< HEAD
-        self.ratio = ratio
-=======
         self.ratio1 = ratio1
         self.ratio2 = ratio2
->>>>>>> origin/sr_woup
         self.data_infos = self.load_annotations()
 
     def load_annotations(self):
@@ -85,19 +77,12 @@ class SRFolderDataset(BaseSRDataset):
             list[dict]: A list of dicts for paired paths of LQ and GT.
         """
         data_infos = []
-<<<<<<< HEAD
-        lq_paths = glob.glob(os.path.join(self.lq_folder, '*.png'))
-        gt_paths = glob.glob(os.path.join(self.lq_folder, '*.png'))
-        length = int(self.ratio * len(gt_paths))
-        gt_paths = gt_paths[:length]
-=======
         # lq_paths = glob.glob(os.path.join(self.lq_folder, '*.png'))
         gt_paths = glob.glob(os.path.join(self.gt_folder, '*.png'))
         # random.seed(1)
         # random.shuffle(gt_paths)
         # length = int(self.ratio * len(gt_paths))
         gt_paths = gt_paths[int(self.ratio1 * len(gt_paths)):int(self.ratio2 * len(gt_paths))]
->>>>>>> origin/sr_woup
         for gt_path in gt_paths:
             img_name = osp.basename(gt_path)
             lq_path = osp.join(self.lq_folder, img_name)
@@ -119,9 +104,5 @@ class SRFolderDataset(BaseSRDataset):
         #                         f'{ext}'))
         #     assert lq_path in lq_paths, f'{lq_path} is not in lq_paths.'
         #     data_infos.append(dict(lq_path=lq_path, gt_path=gt_path))
-<<<<<<< HEAD
-        print('ddd', data_infos)
-=======
         # print('ddd', data_infos)
->>>>>>> origin/sr_woup
         return data_infos

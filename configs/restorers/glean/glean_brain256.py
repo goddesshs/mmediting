@@ -100,57 +100,84 @@ real_pipeline=[
     dict(type='ImageToTensor', keys=['lq'])
 ]
 
-# test_pipeline = [
-#     dict(type='LoadImageFromFile', io_backend='disk', key='lq'),
-#     dict(type='LoadImageFromFile', io_backend='disk', key='gt'),
-#     # dict(type='MATLABLikeResize', keys=['gt'], output_shape=(256, 256)),
-#     dict(type='MATLABLikeResize', keys=['lq'], output_shape=(32, 32)),
-#     dict(type='RescaleToZeroOne', keys=['lq']),
-#     dict(
-#         type='Normalize',
-#         keys=['lq'],
-#         mean=[0.5, 0.5, 0.5],
-#         std=[0.5, 0.5, 0.5],
-#         to_rgb=True),
-#     dict(type='ImageToTensor', keys=['lq']),
-# ]
 
 data = dict(
-    workers_per_gpu=4,
-    train_dataloader=dict(samples_per_gpu=6, drop_last=True),
-    val_dataloader=dict(samples_per_gpu=6),
-    test_dataloader=dict(samples_per_gpu=6),
+    workers_per_gpu=2,
+    train_dataloader=dict(samples_per_gpu=2, drop_last=True),
+    val_dataloader=dict(samples_per_gpu=2),
+    test_dataloader=dict(samples_per_gpu=2),
     train=dict(
         type='RepeatDataset',
         times=1000,
         dataset=dict(
             type=train_dataset_type,
-            lq_folder='/dssg/home/acct-seesb/seesb-user1/hs/hualiao_mri/mri_rot_imgs/1/lr',
-            gt_folder='/dssg/home/acct-seesb/seesb-user1/hs/hualiao_mri/mri_rot_imgs/1/hr',
+            lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/train_lr3',
+            gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/train_hr3',
             # ann_file='data/DIV2K/meta_info_DIV2K800sub_GT.txt',
             pipeline=train_pipeline,
             scale=scale,
             ratio1=0,
-            ratio2=0.25)),
+            ratio2=0.3)),
     val=dict(
         type=val_dataset_type,
-        lq_folder='/dssg/home/acct-seesb/seesb-user1/hs/hualiao_mri/mri_rot_imgs/1/lr',
-            gt_folder='/dssg/home/acct-seesb/seesb-user1/hs/hualiao_mri/mri_rot_imgs/1/hr',
+        lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_lr3',
+        gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_hr3',
         pipeline=test_pipeline,
         scale=scale,
         filename_tmpl='{}',
-        ratio1=0.8,
-        ratio2=0.85),
+        ratio1=0,
+        ratio2=0.15),
     test=dict(
         type=val_dataset_type,
-        lq_folder='/dssg/home/acct-seesb/seesb-user1/hs/hualiao_mri/mri_rot_imgs/1/lr',
-        gt_folder='/dssg/home/acct-seesb/seesb-user1/hs/hualiao_mri/mri_rot_imgs/1/hr',
+        lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_lr3',
+        gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_hr3',
         # lq_folder='/home3/huangshan/dataset/hcp_imgs/3/2/lr',
         # gt_folder='/home3/huangshan/dataset/hcp_imgs/3/2/hr',
         pipeline=test_pipeline,
         scale=scale,
         filename_tmpl='{}',
-        ratio=0.06))
+        ratio1=0.90,
+        ratio2=0.95))
+
+
+# data = dict(
+#     workers_per_gpu=4,
+#     train_dataloader=dict(samples_per_gpu=2, drop_last=True),
+#     val_dataloader=dict(samples_per_gpu=2),
+#     test_dataloader=dict(samples_per_gpu=2),
+#     train=dict(
+#         type='RepeatDataset',
+#         times=1000,
+#         dataset=dict(
+#             type=train_dataset_type,
+#             lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/train_lr3',
+#             gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/train_hr3',
+#             # ann_file='data/DIV2K/meta_info_DIV2K800sub_GT.txt',
+#             pipeline=train_pipeline,
+#             scale=scale,
+#             ratio1=0,
+#             ratio2=0.003)),
+#     val=dict(
+#         type=val_dataset_type,
+#         lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_lr3',
+#         gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_hr3',
+#         pipeline=test_pipeline,
+#         scale=scale,
+#         filename_tmpl='{}',
+#         ratio1=0,
+#         ratio2=0.0015),
+#     test=dict(
+#         type=val_dataset_type,
+#         lq_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_lr3',
+#         gt_folder='/home3/huangshan/reconstruction/SRCNN/SRCNN/mri_data/data_x1_y1_z1/imgs_rot/1/val_hr3',
+#         # lq_folder='/home3/huangshan/dataset/hcp_imgs/3/2/lr',
+#         # gt_folder='/home3/huangshan/dataset/hcp_imgs/3/2/hr',
+#         pipeline=test_pipeline,
+#         scale=scale,
+#         filename_tmpl='{}',
+#         ratio1=0.90,
+#         ratio2=0.95))
+
 
 # optimizer
 optimizers = dict(
@@ -166,8 +193,8 @@ lr_config = dict(
     restart_weights=[1],
     min_lr=1e-7)
 
-checkpoint_config = dict(interval=5000, save_optimizer=True, by_epoch=False)
-evaluation = dict(interval=5000, save_image=False)
+checkpoint_config = dict(interval=3000, save_optimizer=True, by_epoch=False)
+evaluation = dict(interval=30000, save_image=False)
 log_config = dict(
     interval=2,
     hooks=[
